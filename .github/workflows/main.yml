@@ -45,6 +45,6 @@ jobs:
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: container-com-6ix-auth0-user-prov-service
+        service: service-com-6ix-auth0-user-prov
         cluster: cluster-com-6ix-auth0-user-prov
         wait-for-service-stability: true	 
