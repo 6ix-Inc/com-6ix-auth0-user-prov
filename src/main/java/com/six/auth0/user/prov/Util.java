@@ -10,12 +10,16 @@ public class Util {
 
 	public static String loggable(Object object) {
 		try {
-			mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-			return mapper.writeValueAsString(object);
+			return loggable2(object);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	private static String loggable2(Object object) throws JsonProcessingException {
+		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		return mapper.writeValueAsString(object);
 	}
 
 	public static String toJsonString(Object object) throws JsonProcessingException {
