@@ -9,7 +9,7 @@
         "logDriver": "awslogs",
         "secretOptions": null,
         "options": {
-          "awslogs-group": "/ecs/task-definition-malotian-com-6ix-auth0-user-prov",
+          "awslogs-group": "/ecs/task-definition-com-6ix-auth0-user-prov",
           "awslogs-region": "ca-central-1",
           "awslogs-stream-prefix": "ecs"
         }
@@ -60,7 +60,7 @@
   "placementConstraints": [],
   "memory": "512",
   "taskRoleArn": null,
-  "family": "task-definition-malotian-com-6ix-auth0-user-prov",
+  "family": "task-definition-com-6ix-auth0-user-prov",
   "pidMode": null,
   "requiresCompatibilities": [
     "FARGATE"
