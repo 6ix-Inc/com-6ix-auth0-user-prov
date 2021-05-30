@@ -60,10 +60,6 @@
   "placementConstraints": [],
   "memory": "512",
   "taskRoleArn": null,
-  "compatibilities": [
-    "EC2",
-    "FARGATE"
-  ],
   "taskDefinitionArn": "arn:aws:ecs:ca-central-1:215576259319:task-definition/td-com-6ix-auth0-user-prov:1",
   "family": "td-com-6ix-auth0-user-prov",
   "requiresAttributes": [
