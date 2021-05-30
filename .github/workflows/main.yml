@@ -16,6 +16,6 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile    
+      run: docker build . --file Dockerfile -t sukhpindersdhanjal/testdockerimage:latest
     - name: Docker Push
-      run: docker push sukhpindersdhanjal/testdockerimage
+      run: docker push sukhpindersdhanjal/testdockerimage:latest
