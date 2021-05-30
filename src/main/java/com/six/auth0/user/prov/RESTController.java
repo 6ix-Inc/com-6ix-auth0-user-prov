@@ -19,11 +19,12 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 @RestController
 public class RESTController {
-	
+
 	Logger logger = LoggerFactory.getLogger(RESTController.class);
 
 	@RequestMapping(value = "/post-user-registeration", method = RequestMethod.POST)
-	public Map<String, Integer> postUserRegisteration(@RequestBody Map<String, Object> payload) throws UnirestException {
+	public Map<String, Integer> postUserRegisteration(@RequestBody Map<String, Object> payload)
+			throws UnirestException {
 		logger.info("post-user-registeration");
 
 		logger.debug(Util.loggable(payload));
@@ -62,37 +63,30 @@ public class RESTController {
 		logger.info("adbutlerResponse:Status: {}", adbutlerResponse.getStatus());
 		logger.info("adbutlerResponse:StatusText {}", adbutlerResponse.getStatusText());
 		logger.info("adbutlerResponse:Body {}", adbutlerResponse.getBody());
-		
+
 		Unirest.setTimeouts(0, 0);
 		HttpResponse<JsonNode> accessTokenResponse = Unirest.post("https://api.archiebot.com/api/oauth/access_token")
-		  .header("Accept", "application/vnd.archiebot.v1+json")
-		  .field("grant_type", "password")
-		  .field("client_id", "QhEoz2HWCjrCXTaaMgyUJCqiIUAqgLNVkm1NO5hI")
-		  .field("client_secret", "0e06c140538f65adb7c3d62ae3704e9e")
-		  .field("username", "friends@6ix.com")
-		  .field("password", "!2wtG:(Tgrte:O")
-		  .asJson();
-		
+				.header("Accept", "application/vnd.archiebot.v1+json").field("grant_type", "password")
+				.field("client_id", "QhEoz2HWCjrCXTaaMgyUJCqiIUAqgLNVkm1NO5hI")
+				.field("client_secret", "0e06c140538f65adb7c3d62ae3704e9e").field("username", "friends@6ix.com")
+				.field("password", "!2wtG:(Tgrte:O").asJson();
+
 		JSONObject accessToken = accessTokenResponse.getBody().getObject().getJSONObject("accessToken");
-		String authorizationHeader = MessageFormat.format("{0} {1}", accessToken.getString("token_type"),accessToken.getString("access_token"));
-		
+		String authorizationHeader = MessageFormat.format("{0} {1}", accessToken.getString("token_type"),
+				accessToken.getString("access_token"));
+
 		HttpResponse<String> liveWebinarResponse = Unirest.post("https://api.archiebot.com/api/users")
-		  .header("Accept", "application/vnd.archiebot.v1+json")
-		  .header("Authorization", authorizationHeader)
-		  .field("package_id", "338")
-		  .field("email", payload.get("email"))
-		  .field("password", "U"+payload.get("email"))
-		  .field("status", "active")
-		  .field("country_code_iso2", "US")
-		  .field("confirmed", "true")
-		  .asString();		
+				.header("Accept", "application/vnd.archiebot.v1+json").header("Authorization", authorizationHeader)
+				.field("package_id", "338").field("email", payload.get("email"))
+				.field("password", "U" + payload.get("email")).field("status", "active")
+				.field("country_code_iso2", "US").field("confirmed", "true").asString();
 
 		compositeReturn.put("liveWebinarResponse", liveWebinarResponse.getStatus());
-		
+
 		logger.info("liveWebinarResponse: {}", liveWebinarResponse.getStatus());
 		logger.info("liveWebinarResponse:StatusText {}", liveWebinarResponse.getStatusText());
 		logger.info("liveWebinarResponse:Body {}", liveWebinarResponse.getBody());
-		
+
 		return compositeReturn;
 	}
 }
