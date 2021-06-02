@@ -1,6 +1,5 @@
 <configuration>
 
-
 	<appender name="STDOUT"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
@@ -37,7 +36,6 @@
 		<appender-ref ref="FILE" />
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="SOCKET" />
-
 	</root>
 
 </configuration>
