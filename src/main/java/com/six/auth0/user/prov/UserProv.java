@@ -70,7 +70,7 @@ public class UserProv {
 		compositeReturn.put("adbutlerResponse", adbutlerResponse.getStatus());
 
 		logger.info("adbutlerResponse_Status## {}", adbutlerResponse.getStatus());
-		logger.info("adbutlerResponse_StausText## {}", adbutlerResponse.getStatusText());
+		logger.info("adbutlerResponse_StatusText## {}", adbutlerResponse.getStatusText());
 		logger.info("adbutlerResponse_Body## {}", adbutlerResponse.getBody());
 
 		Unirest.setTimeouts(0, 0);

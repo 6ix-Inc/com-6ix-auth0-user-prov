@@ -29,10 +29,10 @@ public class LogToSheet {
 		ArrayList<String> values = new ArrayList<>();
 
 		for (String line : lines) {
-			if (!line.contains("c.six.auth0.user.prov.RESTController - "))
+			if (!line.contains("com.six.auth0.user.prov.UserProv - "))
 				continue;
-			String message = line.substring(line.indexOf("c.six.auth0.user.prov.RESTController - ")
-					+ "c.six.auth0.user.prov.RESTController - ".length());
+			String message = line.substring(line.indexOf("com.six.auth0.user.prov.UserProv - ")
+					+ "com.six.auth0.user.prov.UserProv - ".length());
 
 			if (message.startsWith("{\"email\":\"")) {
 				if (values.size() > 0) {
