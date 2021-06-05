@@ -1,7 +1,11 @@
 package com.six.auth0.user.prov;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONObject;
@@ -14,9 +18,22 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class UserProv {
-	
-	static Logger logger = LoggerFactory.getLogger(RESTController.class);
-	
+
+	static Logger logger = LoggerFactory.getLogger(UserProv.class);
+
+	public static void main(String[] args) throws IOException, UnirestException {
+
+		List<String> lines = Files.readAllLines(Path.of("input/input.txt"));
+
+		for (String line : lines) {
+			logger.info(line);
+			//logger.info(Util.loggable(Util.fromJsonString(line)));
+			createUser(Util.fromJsonString(line));
+			//return;
+		}
+
+	}
+
 	public static Map<String, Integer> createUser(Map<String, Object> payload) throws UnirestException {
 		logger.debug(Util.loggable(payload));
 
