@@ -21,7 +21,7 @@ public class RESTController {
 			throws UnirestException {
 		logger.info("post-user-registeration");
 
-		return Util.createUser(payload);
+		return UserProv.createUser(payload);
 	}
 
 }
