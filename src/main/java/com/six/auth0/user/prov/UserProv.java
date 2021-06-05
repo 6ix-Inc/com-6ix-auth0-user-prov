@@ -35,7 +35,8 @@ public class UserProv {
 	}
 
 	public static Map<String, Integer> createUser(Map<String, Object> payload) throws UnirestException {
-		logger.debug(Util.loggable(payload));
+		//logger.debug(Util.loggable(payload));
+		logger.debug("email## {}", payload.get("email"));
 
 		Map<String, Integer> compositeReturn = new HashMap<>();
 
@@ -47,9 +48,9 @@ public class UserProv {
 				.queryString("password", payload.get("email")) //
 				.queryString("confirmPassword", payload.get("email")).asJson();
 
-		logger.info("elasticemailResponse:Status: {}", elasticemailResponse.getStatus());
-		logger.info("elasticemailResponse:StatusText {}", elasticemailResponse.getStatusText());
-		logger.info("elasticemailResponse:Body {}", elasticemailResponse.getBody());
+		logger.info("elasticemailResponse_Status## {}", elasticemailResponse.getStatus());
+		logger.info("elasticemailResponse_StatusText## {}", elasticemailResponse.getStatusText());
+		logger.info("elasticemailResponse_Body## {}", elasticemailResponse.getBody());
 
 		compositeReturn.put("elasticemailResponse", elasticemailResponse.getStatus());
 
@@ -68,9 +69,9 @@ public class UserProv {
 
 		compositeReturn.put("adbutlerResponse", adbutlerResponse.getStatus());
 
-		logger.info("adbutlerResponse:Status: {}", adbutlerResponse.getStatus());
-		logger.info("adbutlerResponse:StatusText {}", adbutlerResponse.getStatusText());
-		logger.info("adbutlerResponse:Body {}", adbutlerResponse.getBody());
+		logger.info("adbutlerResponse_Status## {}", adbutlerResponse.getStatus());
+		logger.info("adbutlerResponse_StausText## {}", adbutlerResponse.getStatusText());
+		logger.info("adbutlerResponse_Body## {}", adbutlerResponse.getBody());
 
 		Unirest.setTimeouts(0, 0);
 		HttpResponse<JsonNode> accessTokenResponse = Unirest.post("https://api.archiebot.com/api/oauth/access_token")
@@ -86,14 +87,14 @@ public class UserProv {
 		HttpResponse<String> liveWebinarResponse = Unirest.post("https://api.archiebot.com/api/users")
 				.header("Accept", "application/vnd.archiebot.v1+json").header("Authorization", authorizationHeader)
 				.field("package_id", "338").field("email", payload.get("email"))
-				.field("password", "U" + payload.get("email")).field("status", "active")
+				.field("password", "U1" + payload.get("email")).field("status", "active")
 				.field("country_code_iso2", "US").field("confirmed", "true").asString();
 
 		compositeReturn.put("liveWebinarResponse", liveWebinarResponse.getStatus());
 
-		logger.info("liveWebinarResponse: {}", liveWebinarResponse.getStatus());
-		logger.info("liveWebinarResponse:StatusText {}", liveWebinarResponse.getStatusText());
-		logger.info("liveWebinarResponse:Body {}", liveWebinarResponse.getBody());
+		logger.info("liveWebinarResponse_Status## {}", liveWebinarResponse.getStatus());
+		logger.info("liveWebinarResponse_StatusText## {}", liveWebinarResponse.getStatusText());
+		logger.info("liveWebinarResponse_Body## {}", liveWebinarResponse.getBody());
 
 		return compositeReturn;
 	}
