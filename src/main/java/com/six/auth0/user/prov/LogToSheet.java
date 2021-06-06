@@ -34,22 +34,15 @@ public class LogToSheet {
 			String message = line.substring(line.indexOf("com.six.auth0.user.prov.UserProv - ")
 					+ "com.six.auth0.user.prov.UserProv - ".length());
 
-			if (message.startsWith("{\"email\":\"")) {
+			String[] tokens = message.split("##");
+			values.add(HEADERS.valueOf(tokens[0].trim()).ordinal(), tokens[1].trim());
+			
+			if (message.startsWith("email##")) {
 				if (values.size() > 0) {
 					csv.printRecord(values);
 				}
 				values = new ArrayList<>();
-				logger.info(message);
-				String email = (String) Util.fromJsonString(message).get("email");
-				logger.info(email);
-				values.add(HEADERS.email.ordinal(), email);
-			} else if (message.contains("##")) {
-				String[] tokens = message.split("##");
-				values.add(HEADERS.valueOf(tokens[0].trim()).ordinal(), tokens[1].trim());
-				//System.out.println(HEADERS.valueOf(tokens[0]));
 			}
-			
-	
 		}
 		csv.close();
 	}
