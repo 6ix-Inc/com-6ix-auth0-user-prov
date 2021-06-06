@@ -1,13 +1,14 @@
 package com.six.auth0.user.prov;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class UserProv {
 
 	public static void main(String[] args) throws IOException, UnirestException {
 
-		List<String> lines = Files.readAllLines(Path.of("input/input.txt"));
+		List<String> lines = FileUtils.readLines(new File("input/input.txt"),Charset.defaultCharset());
 		for (String line : lines) {
 			createUser(Util.fromJsonString(line));
 		}
