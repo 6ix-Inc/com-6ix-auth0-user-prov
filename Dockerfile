@@ -1,11 +1,11 @@
-FROM gradle:4.7.0-jdk8-alpine AS build
-COPY --chown=gradle:gradle . /home/gradle/src
-WORKDIR /home/gradle/src
+FROM gradle:7.0.2-jdk8 AS build
+COPY --chown=gradle:gradle . /usr/app
+WORKDIR /usr/app
 RUN gradle build --no-daemon 
 
 FROM gcr.io/distroless/java  
-COPY --from=build /usr/src/app/target/auth0.user.prov-1.0.jar /usr/app/auth0.user.prov-1.0.jar  
+COPY --from=build /usr/app/build/libs/com-6ix-auth0-user-prov-1.0.jar /usr/app/com-6ix-auth0-user-prov-1.0.jar  
 EXPOSE 8080  
 
-ENTRYPOINT ["java","-jar","/usr/app/auth0.user.prov-1.0.jar"] 
+ENTRYPOINT ["java","-jar","/usr/app/com-6ix-auth0-user-prov-1.0.jar"] 
  
