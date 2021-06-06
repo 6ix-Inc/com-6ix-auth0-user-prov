@@ -31,6 +31,8 @@
 		<port>8888</port>
 		<reconnectionDelay>10000</reconnectionDelay>
 	</appender>
+	
+	<logger name="com.six.auth0.user.prov" level="debug" />
 
 	<root level="info">
 		<appender-ref ref="FILE" />
