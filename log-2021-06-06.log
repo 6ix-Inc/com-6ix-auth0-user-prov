@@ -1,0 +1,16 @@
+[main] INFO  com.six.auth0.user.prov.UserProv - {"email":"daniel@6ix.com"}
+[main] DEBUG com.six.auth0.user.prov.UserProv - {"email":"daniel@6ix.com"}
+[main] INFO  com.six.auth0.user.prov.UserProv - email## daniel@6ix.com
+[main] INFO  com.six.auth0.user.prov.UserProv - elasticemailResponse_Status## 200
+[main] INFO  com.six.auth0.user.prov.UserProv - elasticemailResponse_StatusText## OK
+[main] INFO  com.six.auth0.user.prov.UserProv - elasticemailResponse_Body## {"success":false,"error":"AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS"}
+[main] WARN  o.a.h.c.p.ResponseProcessCookies - Invalid cookie header: "Set-Cookie: sparkKey=f02aa0ab46f3e5846dd55753c9811b08a0; Expires=Monday, 06-Jun-2022 05:40:57 GMT+0000; Max-Age=31536000; Path=/; Domain=.adbutler.com; Secure; HttpOnly; SameSite=Strict". Invalid 'expires' attribute: Monday, 06-Jun-2022 05:40:57 GMT+0000
+[main] INFO  com.six.auth0.user.prov.UserProv - adbutlerResponse_Status## 200
+[main] INFO  com.six.auth0.user.prov.UserProv - adbutlerResponse_StatusText## OK
+[main] INFO  com.six.auth0.user.prov.UserProv - adbutlerResponse_Body## {"parent":"admin","user_access":false,"name":"daniel@6ix.com","self":"/v2/advertisers/158199","id":158199,"email":"daniel@6ix.com","object":"advertiser","can_change_password":true,"can_add_ad_items":true,"has_password":false}
+[main] INFO  com.six.auth0.user.prov.UserProv - {"email":"hamado4083@donmah.com"}
+[main] DEBUG com.six.auth0.user.prov.UserProv - {"email":"hamado4083@donmah.com"}
+[main] INFO  com.six.auth0.user.prov.UserProv - email## hamado4083@donmah.com
+[main] INFO  com.six.auth0.user.prov.UserProv - elasticemailResponse_Status## 200
+[main] INFO  com.six.auth0.user.prov.UserProv - elasticemailResponse_StatusText## OK
+[main] INFO  com.six.auth0.user.prov.UserProv - elasticemailResponse_Body## {"success":false,"error":"AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS"}
