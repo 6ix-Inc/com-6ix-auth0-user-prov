@@ -69,6 +69,8 @@ public class UserProv {
 
 		if (existingAdvertisers.contains(adsUser.getString("email")))
 			return compositeReturn;
+		
+		existingAdvertisers.add(adsUser.getString("email"));
 
 		HttpResponse<JsonNode> adbutlerResponse = createUserInAdbutler(adsUser);
 
