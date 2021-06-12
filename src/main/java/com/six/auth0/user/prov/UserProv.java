@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +29,7 @@ public class UserProv {
 
 	public static void main(String[] args) throws IOException, UnirestException {
 
-		List<String> lines = FileUtils.readLines(new File("input/input.txt"),Charset.defaultCharset());
+		List<String> lines = FileUtils.readLines(new File("input/input.txt"), Charset.defaultCharset());
 		for (String line : lines) {
 			createUser(Util.fromJsonString(line));
 		}
@@ -48,11 +51,24 @@ public class UserProv {
 
 		compositeReturn.put("elasticemailResponse", elasticemailResponse.getStatus());
 
+		HttpResponse<JsonNode> liveWebinarResponse = createUserInLivewebinar(payload);
+
+		compositeReturn.put("liveWebinarResponse", liveWebinarResponse.getStatus());
+
+		logger.info("liveWebinarResponse_Status## {}", liveWebinarResponse.getStatus());
+		logger.info("liveWebinarResponse_StatusText## {}", liveWebinarResponse.getStatusText());
+		logger.info("liveWebinarResponse_Body## {}", liveWebinarResponse.getBody());
+
 		JSONObject adsUser = new JSONObject();
 		adsUser.put("can_change_password", true);
 		adsUser.put("can_add_ad_items", true);
 		adsUser.put("email", payload.get("email"));
 		adsUser.put("name", payload.get("email"));
+
+		Set<String> existingAdvertisers = getExistingAdvertisers();
+
+		if (existingAdvertisers.contains(adsUser.getString("email")))
+			return compositeReturn;
 
 		HttpResponse<JsonNode> adbutlerResponse = createUserInAdbutler(adsUser);
 
@@ -61,14 +77,6 @@ public class UserProv {
 		logger.info("adbutlerResponse_Status## {}", adbutlerResponse.getStatus());
 		logger.info("adbutlerResponse_StatusText## {}", adbutlerResponse.getStatusText());
 		logger.info("adbutlerResponse_Body## {}", adbutlerResponse.getBody());
-
-		HttpResponse<JsonNode> liveWebinarResponse = createUserInLivewebinar(payload);
-
-		compositeReturn.put("liveWebinarResponse", liveWebinarResponse.getStatus());
-
-		logger.info("liveWebinarResponse_Status## {}", liveWebinarResponse.getStatus());
-		logger.info("liveWebinarResponse_StatusText## {}", liveWebinarResponse.getStatusText());
-		logger.info("liveWebinarResponse_Body## {}", liveWebinarResponse.getBody());
 
 		return compositeReturn;
 	}
@@ -115,5 +123,34 @@ public class UserProv {
 				.queryString("password", payload.get("email")) //
 				.queryString("confirmPassword", payload.get("email")).asJson();
 		return elasticemailResponse;
+	}
+
+	@RetryOnFailure(attempts = 2, delay = 10, verbose = false)
+	private static Set<String> getExistingAdvertisers() throws UnirestException {
+		Set<String> existing = new HashSet<>();
+
+		int offset = 0;
+
+		boolean hasMore = true;
+		while (hasMore) {
+
+			HttpResponse<JsonNode> adbutlerResponse = Unirest.get("https://api.adbutler.com/v2/advertisers") //
+					.header("Accept", "application/json") //
+					.header("Authorization", "Basic 18ffdf2254db3ece215df5264cef9bae").queryString("offset", offset)
+					.asJson();
+
+			logger.info("adbutlerResponse_Status## {}", adbutlerResponse.getStatus());
+			logger.info("adbutlerResponse_StatusText## {}", adbutlerResponse.getStatusText());
+			logger.info("adbutlerResponse_Body## {}", adbutlerResponse.getBody());
+
+			JSONArray data = adbutlerResponse.getBody().getObject().getJSONArray("data");
+			hasMore = adbutlerResponse.getBody().getObject().getBoolean("has_more");
+			offset += data.length();
+
+			for (int i = 0, l = data.length(); i < l; i++) {
+				existing.add(data.getJSONObject(i).getString("email"));
+			}
+		}
+		return existing;
 	}
 }
