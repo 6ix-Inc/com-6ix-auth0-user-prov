@@ -15,28 +15,31 @@ import org.slf4j.LoggerFactory;
 
 public class LogToSheet {
 
-	static Logger logger = LoggerFactory.getLogger(LogToSheet.class);
-	static enum HEADERS {
+	enum HEADERS {
 		email, elasticemailResponse_Status, elasticemailResponse_StatusText, elasticemailResponse_Body, //
 		adbutlerResponse_Status, adbutlerResponse_StatusText, adbutlerResponse_Body, //
 		liveWebinarResponse_Status, liveWebinarResponse_StatusText, liveWebinarResponse_Body
 	}
-	
+
+	static Logger logger = LoggerFactory.getLogger(LogToSheet.class);
+
 	public static void main(String[] args) throws IOException {
-		List<String> lines = FileUtils.readLines(new File("log-2021-06-05.log"),Charset.defaultCharset());
-		final CSVPrinter csv = new CSVPrinter(new FileWriter(new File("log-2021-06-05.csv")), CSVFormat.DEFAULT.withHeader(HEADERS.class));
-		
+		final List<String> lines = FileUtils.readLines(new File("log-2021-06-05.log"), Charset.defaultCharset());
+		final CSVPrinter csv = new CSVPrinter(new FileWriter(new File("log-2021-06-05.csv")),
+				CSVFormat.DEFAULT.withHeader(HEADERS.class));
+
 		ArrayList<String> values = new ArrayList<>();
 
-		for (String line : lines) {
-			if (!line.contains("com.six.auth0.user.prov.UserProv - "))
+		for (final String line : lines) {
+			if (!line.contains("com.six.auth0.user.prov.UserProv - ")) {
 				continue;
-			String message = line.substring(line.indexOf("com.six.auth0.user.prov.UserProv - ")
+			}
+			final String message = line.substring(line.indexOf("com.six.auth0.user.prov.UserProv - ")
 					+ "com.six.auth0.user.prov.UserProv - ".length());
 
-			String[] tokens = message.split("##");
+			final String[] tokens = message.split("##");
 			values.add(HEADERS.valueOf(tokens[0].trim()).ordinal(), tokens[1].trim());
-			
+
 			if (message.startsWith("email##")) {
 				if (values.size() > 0) {
 					csv.printRecord(values);

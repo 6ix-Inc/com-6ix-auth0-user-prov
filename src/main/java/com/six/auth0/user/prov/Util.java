@@ -16,10 +16,15 @@ public class Util {
 	static ObjectMapper mapper = new ObjectMapper();
 	static Logger logger = LoggerFactory.getLogger(RESTController.class);
 
+	public static Map<String, Object> fromJsonString(String object) throws JsonProcessingException {
+		return mapper.readValue(object, new TypeReference<Map<String, Object>>() {
+		});
+	}
+
 	public static String loggable(Object object) {
 		try {
 			return loggable2(object);
-		} catch (JsonProcessingException e) {
+		} catch (final JsonProcessingException e) {
 			e.printStackTrace();
 		}
 		return "";
@@ -30,17 +35,12 @@ public class Util {
 		return mapper.writeValueAsString(object);
 	}
 
+	public static JsonNode toJsonNode(String object) throws JsonProcessingException {
+		return mapper.readValue(object, JsonNode.class);
+	}
+
 	public static String toJsonString(Object object) throws JsonProcessingException {
 		return mapper.writeValueAsString(object);
-	}
-	
-	public static Map<String,Object> fromJsonString(String object) throws JsonProcessingException {
-		return mapper.readValue(object,
-			    new TypeReference<Map<String,Object>>(){});
-	}
-	
-	public static JsonNode toJsonNode(String object) throws JsonProcessingException {
-		return mapper.readValue(object,JsonNode.class);
 	}
 
 }

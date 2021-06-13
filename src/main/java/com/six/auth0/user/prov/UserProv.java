@@ -27,23 +27,14 @@ public class UserProv {
 
 	static Logger logger = LoggerFactory.getLogger(UserProv.class);
 
-	public static void main(String[] args) throws IOException, UnirestException {
-
-		List<String> lines = FileUtils.readLines(new File("input/input.txt"), Charset.defaultCharset());
-		for (String line : lines) {
-			createUser(Util.fromJsonString(line));
-		}
-
-	}
-
 	@Loggable(Loggable.DEBUG)
 	public static Map<String, Integer> createUser(Map<String, Object> payload) throws UnirestException {
 		logger.debug(Util.loggable(payload));
 		logger.info("email## {}", payload.get("email"));
 
-		Map<String, Integer> compositeReturn = new HashMap<>();
+		final Map<String, Integer> compositeReturn = new HashMap<>();
 
-		HttpResponse<JsonNode> elasticemailResponse = createUserInEmail(payload);
+		final HttpResponse<JsonNode> elasticemailResponse = createUserInEmail(payload);
 
 		logger.info("elasticemailResponse_Status## {}", elasticemailResponse.getStatus());
 		logger.info("elasticemailResponse_StatusText## {}", elasticemailResponse.getStatusText());
@@ -51,7 +42,7 @@ public class UserProv {
 
 		compositeReturn.put("elasticemailResponse", elasticemailResponse.getStatus());
 
-		HttpResponse<JsonNode> liveWebinarResponse = createUserInLivewebinar(payload);
+		final HttpResponse<JsonNode> liveWebinarResponse = createUserInLivewebinar(payload);
 
 		compositeReturn.put("liveWebinarResponse", liveWebinarResponse.getStatus());
 
@@ -59,20 +50,21 @@ public class UserProv {
 		logger.info("liveWebinarResponse_StatusText## {}", liveWebinarResponse.getStatusText());
 		logger.info("liveWebinarResponse_Body## {}", liveWebinarResponse.getBody());
 
-		JSONObject adsUser = new JSONObject();
+		final JSONObject adsUser = new JSONObject();
 		adsUser.put("can_change_password", true);
 		adsUser.put("can_add_ad_items", true);
 		adsUser.put("email", payload.get("email"));
 		adsUser.put("name", payload.get("email"));
 
-		Set<String> existingAdvertisers = getExistingAdvertisers();
+		final Set<String> existingAdvertisers = getExistingAdvertisers();
 
-		if (existingAdvertisers.contains(adsUser.getString("email")))
+		if (existingAdvertisers.contains(adsUser.getString("email"))) {
 			return compositeReturn;
-		
+		}
+
 		existingAdvertisers.add(adsUser.getString("email"));
 
-		HttpResponse<JsonNode> adbutlerResponse = createUserInAdbutler(adsUser);
+		final HttpResponse<JsonNode> adbutlerResponse = createUserInAdbutler(adsUser);
 
 		compositeReturn.put("adbutlerResponse", adbutlerResponse.getStatus());
 
@@ -84,30 +76,9 @@ public class UserProv {
 	}
 
 	@RetryOnFailure(attempts = 2, delay = 10, verbose = false)
-	private static HttpResponse<JsonNode> createUserInLivewebinar(Map<String, Object> payload) throws UnirestException {
-		Unirest.setTimeouts(0, 0);
-		HttpResponse<JsonNode> accessTokenResponse = Unirest.post("https://api.archiebot.com/api/oauth/access_token")
-				.header("Accept", "application/vnd.archiebot.v1+json").field("grant_type", "password")
-				.field("client_id", "QhEoz2HWCjrCXTaaMgyUJCqiIUAqgLNVkm1NO5hI")
-				.field("client_secret", "0e06c140538f65adb7c3d62ae3704e9e").field("username", "friends@6ix.com")
-				.field("password", "!2wtG:(Tgrte:O").asJson();
-
-		JSONObject accessToken = accessTokenResponse.getBody().getObject().getJSONObject("accessToken");
-		String authorizationHeader = MessageFormat.format("{0} {1}", accessToken.getString("token_type"),
-				accessToken.getString("access_token"));
-
-		HttpResponse<JsonNode> liveWebinarResponse = Unirest.post("https://api.archiebot.com/api/users")
-				.header("Accept", "application/vnd.archiebot.v1+json").header("Authorization", authorizationHeader)
-				.field("package_id", "338").field("email", payload.get("email"))
-				.field("password", "U1" + payload.get("email")).field("status", "active")
-				.field("country_code_iso2", "US").field("confirmed", "true").asJson();
-		return liveWebinarResponse;
-	}
-
-	@RetryOnFailure(attempts = 2, delay = 10, verbose = false)
 	private static HttpResponse<JsonNode> createUserInAdbutler(JSONObject adsUser) throws UnirestException {
 		Unirest.setTimeouts(0, 0);
-		HttpResponse<JsonNode> adbutlerResponse = Unirest.post("https://api.adbutler.com/v2/advertisers") //
+		final HttpResponse<JsonNode> adbutlerResponse = Unirest.post("https://api.adbutler.com/v2/advertisers") //
 				.header("Accept", "application/json") //
 				.header("Authorization", "Basic 18ffdf2254db3ece215df5264cef9bae") //
 				.header("Content-Type", "application/json") //
@@ -117,7 +88,7 @@ public class UserProv {
 
 	@RetryOnFailure(attempts = 2, delay = 10, verbose = false)
 	private static HttpResponse<JsonNode> createUserInEmail(Map<String, Object> payload) throws UnirestException {
-		HttpResponse<JsonNode> elasticemailResponse = Unirest
+		final HttpResponse<JsonNode> elasticemailResponse = Unirest
 				.get("https://api.elasticemail.com/v2/account/addsubaccount") //
 				.queryString("apikey",
 						"02BA2F49FF06186BB8D55FC5A0B168F4F676713FD1B2B9A4AF32775E340F88FCD3BE60E87629B669AED62CE6466BE11D")
@@ -128,15 +99,37 @@ public class UserProv {
 	}
 
 	@RetryOnFailure(attempts = 2, delay = 10, verbose = false)
+	private static HttpResponse<JsonNode> createUserInLivewebinar(Map<String, Object> payload) throws UnirestException {
+		Unirest.setTimeouts(0, 0);
+		final HttpResponse<JsonNode> accessTokenResponse = Unirest
+				.post("https://api.archiebot.com/api/oauth/access_token")
+				.header("Accept", "application/vnd.archiebot.v1+json").field("grant_type", "password")
+				.field("client_id", "QhEoz2HWCjrCXTaaMgyUJCqiIUAqgLNVkm1NO5hI")
+				.field("client_secret", "0e06c140538f65adb7c3d62ae3704e9e").field("username", "friends@6ix.com")
+				.field("password", "!2wtG:(Tgrte:O").asJson();
+
+		final JSONObject accessToken = accessTokenResponse.getBody().getObject().getJSONObject("accessToken");
+		final String authorizationHeader = MessageFormat.format("{0} {1}", accessToken.getString("token_type"),
+				accessToken.getString("access_token"));
+
+		final HttpResponse<JsonNode> liveWebinarResponse = Unirest.post("https://api.archiebot.com/api/users")
+				.header("Accept", "application/vnd.archiebot.v1+json").header("Authorization", authorizationHeader)
+				.field("package_id", "338").field("email", payload.get("email"))
+				.field("password", "U1" + payload.get("email")).field("status", "active")
+				.field("country_code_iso2", "US").field("confirmed", "true").asJson();
+		return liveWebinarResponse;
+	}
+
+	@RetryOnFailure(attempts = 2, delay = 10, verbose = false)
 	private static Set<String> getExistingAdvertisers() throws UnirestException {
-		Set<String> existing = new HashSet<>();
+		final Set<String> existing = new HashSet<>();
 
 		int offset = 0;
 
 		boolean hasMore = true;
 		while (hasMore) {
 
-			HttpResponse<JsonNode> adbutlerResponse = Unirest.get("https://api.adbutler.com/v2/advertisers") //
+			final HttpResponse<JsonNode> adbutlerResponse = Unirest.get("https://api.adbutler.com/v2/advertisers") //
 					.header("Accept", "application/json") //
 					.header("Authorization", "Basic 18ffdf2254db3ece215df5264cef9bae").queryString("offset", offset)
 					.asJson();
@@ -145,7 +138,7 @@ public class UserProv {
 			logger.info("adbutlerResponse_StatusText## {}", adbutlerResponse.getStatusText());
 			logger.info("adbutlerResponse_Body## {}", adbutlerResponse.getBody());
 
-			JSONArray data = adbutlerResponse.getBody().getObject().getJSONArray("data");
+			final JSONArray data = adbutlerResponse.getBody().getObject().getJSONArray("data");
 			hasMore = adbutlerResponse.getBody().getObject().getBoolean("has_more");
 			offset += data.length();
 
@@ -154,5 +147,14 @@ public class UserProv {
 			}
 		}
 		return existing;
+	}
+
+	public static void main(String[] args) throws IOException, UnirestException {
+
+		final List<String> lines = FileUtils.readLines(new File("input/input.txt"), Charset.defaultCharset());
+		for (final String line : lines) {
+			createUser(Util.fromJsonString(line));
+		}
+
 	}
 }
