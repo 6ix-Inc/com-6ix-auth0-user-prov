@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +27,41 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 public class UserProv {
 
 	static Logger logger = LoggerFactory.getLogger(UserProv.class);
+	static Map<String, HashSet<String>> existingAdvertisersCache = new HashMap<>();
+
+	public static Map<String, HashSet<String>> getExistingAdvertisersCache() {
+		return existingAdvertisersCache;
+	}
+
+	@Loggable(Loggable.DEBUG)
+	public static void cleanupAdvertiser(Map<String, Object> payload) throws UnirestException {
+		String email = (String) payload.get("email");
+		
+		logger.info("cleaning advertiser: {}", payload.get("email"));
+
+		if (getExistingAdvertisersCache().containsKey(email)) {
+			List<String> existingAdvertisers = new ArrayList<>(getExistingAdvertisersCache().get(email));
+			logger.info("found {} advertiser(s): {}", existingAdvertisers.size(), String.join(",", existingAdvertisers));
+			
+			if (existingAdvertisers.size() <= 1) return;
+			existingAdvertisers.remove(0);
+			
+			for (String adv: existingAdvertisers)
+			{
+				logger.info("deleting advertiser with id: {}", adv);
+				
+				Unirest.setTimeouts(0, 0);
+				final HttpResponse<JsonNode> adbutlerResponse = Unirest.delete("https://api.adbutler.com/v2/advertisers/" + adv) //
+						.header("Accept", "application/json") //
+						.header("Authorization", "Basic 18ffdf2254db3ece215df5264cef9bae") //
+						.header("Content-Type", "application/json").asJson();
+				
+				logger.info("adbutlerResponse_Status## {}", adbutlerResponse.getStatus());
+				logger.info("adbutlerResponse_StatusText## {}", adbutlerResponse.getStatusText());
+				logger.info("adbutlerResponse_Body## {}", adbutlerResponse.getBody());
+			}
+		}
+	}
 
 	@Loggable(Loggable.DEBUG)
 	public static Map<String, Integer> createUser(Map<String, Object> payload) throws UnirestException {
@@ -56,13 +92,11 @@ public class UserProv {
 		adsUser.put("email", payload.get("email"));
 		adsUser.put("name", payload.get("email"));
 
-		final Set<String> existingAdvertisers = getExistingAdvertisers();
-
-		if (existingAdvertisers.contains(adsUser.getString("email"))) {
+		if (getExistingAdvertisersCache().containsKey(adsUser.getString("email"))) {
 			return compositeReturn;
 		}
 
-		existingAdvertisers.add(adsUser.getString("email"));
+		updateExistingAdvertisersCache(adsUser.getString("email"), "--");
 
 		final HttpResponse<JsonNode> adbutlerResponse = createUserInAdbutler(adsUser);
 
@@ -121,12 +155,9 @@ public class UserProv {
 	}
 
 	@RetryOnFailure(attempts = 2, delay = 10, verbose = false)
-	private static Set<String> getExistingAdvertisers() throws UnirestException {
-		final Set<String> existing = new HashSet<>();
-
+	private static void intitalizeExistingAdvertisersCache() throws UnirestException {
 		int offset = 0;
-
-		boolean hasMore = true;
+		boolean hasMore = getExistingAdvertisersCache().isEmpty();
 		while (hasMore) {
 
 			final HttpResponse<JsonNode> adbutlerResponse = Unirest.get("https://api.adbutler.com/v2/advertisers") //
@@ -143,17 +174,27 @@ public class UserProv {
 			offset += data.length();
 
 			for (int i = 0, l = data.length(); i < l; i++) {
-				existing.add(data.getJSONObject(i).getString("email"));
+				updateExistingAdvertisersCache(data.getJSONObject(i).getString("email"),
+						String.valueOf(data.getJSONObject(i).get("id")));
 			}
 		}
-		return existing;
+	}
+
+	private static void updateExistingAdvertisersCache(String email, String id) {
+		if (!getExistingAdvertisersCache().containsKey(email))
+			getExistingAdvertisersCache().put(email, new HashSet<String>());
+
+		getExistingAdvertisersCache().get(email).add(id);
 	}
 
 	public static void main(String[] args) throws IOException, UnirestException {
 
+		intitalizeExistingAdvertisersCache();
+
 		final List<String> lines = FileUtils.readLines(new File("input/input.txt"), Charset.defaultCharset());
 		for (final String line : lines) {
-			createUser(Util.fromJsonString(line));
+			cleanupAdvertiser(Util.fromJsonString(line)); 
+			//createUser(Util.fromJsonString(line));
 		}
 
 	}
