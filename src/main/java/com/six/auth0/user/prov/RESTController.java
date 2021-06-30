@@ -20,6 +20,7 @@ public class RESTController {
 	public Map<String, Integer> postUserRegisteration(@RequestBody Map<String, Object> payload)
 			throws UnirestException {
 		logger.info("post-user-registeration");
+
 		return UserProv.createUser(payload);
 	}
 

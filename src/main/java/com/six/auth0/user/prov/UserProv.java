@@ -169,9 +169,9 @@ public class UserProv {
 					.header("Authorization", "Basic 18ffdf2254db3ece215df5264cef9bae").queryString("offset", offset)
 					.asJson();
 
-			logger.info("adbutlerResponse_Status## {}", adbutlerResponse.getStatus());
-			logger.info("adbutlerResponse_StatusText## {}", adbutlerResponse.getStatusText());
-			logger.info("adbutlerResponse_Body## {}", adbutlerResponse.getBody());
+			//logger.info("adbutlerResponse_Status## {}", adbutlerResponse.getStatus());
+			//logger.info("adbutlerResponse_StatusText## {}", adbutlerResponse.getStatusText());
+			//logger.info("adbutlerResponse_Body## {}", adbutlerResponse.getBody());
 
 			final JSONArray data = adbutlerResponse.getBody().getObject().getJSONArray("data");
 			hasMore = adbutlerResponse.getBody().getObject().getBoolean("has_more");
