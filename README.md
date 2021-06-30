@@ -17,5 +17,5 @@ after successful build, go to com-6ix-auth0-user-prov/build/libs and copy com-6i
 
 #  run com-6ix-auth0-user-prov
 
-     java -jar com-6ix-auth0-user-prov-1.0.jar 
+     java -jar com-6ix-auth0-user-prov-1.0.jar
 
