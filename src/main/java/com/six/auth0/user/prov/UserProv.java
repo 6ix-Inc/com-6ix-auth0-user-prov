@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
@@ -29,33 +28,32 @@ public class UserProv {
 	static Logger logger = LoggerFactory.getLogger(UserProv.class);
 	static Map<String, HashSet<String>> existingAdvertisersCache = new HashMap<>();
 
-	public static Map<String, HashSet<String>> getExistingAdvertisersCache() {
-		return existingAdvertisersCache;
-	}
-
 	@Loggable(Loggable.DEBUG)
 	public static void cleanupAdvertiser(Map<String, Object> payload) throws UnirestException {
-		String email = (String) payload.get("email");
-		
+		final String email = (String) payload.get("email");
+
 		logger.info("cleaning advertiser: {}", payload.get("email"));
 
 		if (getExistingAdvertisersCache().containsKey(email)) {
-			List<String> existingAdvertisers = new ArrayList<>(getExistingAdvertisersCache().get(email));
-			logger.info("found {} advertiser(s): {}", existingAdvertisers.size(), String.join(",", existingAdvertisers));
-			
-			if (existingAdvertisers.size() <= 1) return;
+			final List<String> existingAdvertisers = new ArrayList<>(getExistingAdvertisersCache().get(email));
+			logger.info("found {} advertiser(s): {}", existingAdvertisers.size(),
+					String.join(",", existingAdvertisers));
+
+			if (existingAdvertisers.size() <= 1) {
+				return;
+			}
 			existingAdvertisers.remove(0);
-			
-			for (String adv: existingAdvertisers)
-			{
+
+			for (final String adv : existingAdvertisers) {
 				logger.info("deleting advertiser with id: {}", adv);
-				
+
 				Unirest.setTimeouts(0, 0);
-				final HttpResponse<JsonNode> adbutlerResponse = Unirest.delete("https://api.adbutler.com/v2/advertisers/" + adv) //
+				final HttpResponse<JsonNode> adbutlerResponse = Unirest
+						.delete("https://api.adbutler.com/v2/advertisers/" + adv) //
 						.header("Accept", "application/json") //
 						.header("Authorization", "Basic 18ffdf2254db3ece215df5264cef9bae") //
 						.header("Content-Type", "application/json").asJson();
-				
+
 				logger.info("adbutlerResponse_Status## {}", adbutlerResponse.getStatus());
 				logger.info("adbutlerResponse_StatusText## {}", adbutlerResponse.getStatusText());
 				logger.info("adbutlerResponse_Body## {}", adbutlerResponse.getBody());
@@ -67,6 +65,8 @@ public class UserProv {
 	public static Map<String, Integer> createUser(Map<String, Object> payload) throws UnirestException {
 		logger.debug(Util.loggable(payload));
 		logger.info("email## {}", payload.get("email"));
+
+		intitalizeExistingAdvertisersCache();
 
 		final Map<String, Integer> compositeReturn = new HashMap<>();
 
@@ -154,6 +154,10 @@ public class UserProv {
 		return liveWebinarResponse;
 	}
 
+	public static Map<String, HashSet<String>> getExistingAdvertisersCache() {
+		return existingAdvertisersCache;
+	}
+
 	@RetryOnFailure(attempts = 2, delay = 10, verbose = false)
 	private static void intitalizeExistingAdvertisersCache() throws UnirestException {
 		int offset = 0;
@@ -180,22 +184,23 @@ public class UserProv {
 		}
 	}
 
-	private static void updateExistingAdvertisersCache(String email, String id) {
-		if (!getExistingAdvertisersCache().containsKey(email))
-			getExistingAdvertisersCache().put(email, new HashSet<String>());
-
-		getExistingAdvertisersCache().get(email).add(id);
-	}
-
 	public static void main(String[] args) throws IOException, UnirestException {
 
 		intitalizeExistingAdvertisersCache();
 
 		final List<String> lines = FileUtils.readLines(new File("input/input.txt"), Charset.defaultCharset());
 		for (final String line : lines) {
-			cleanupAdvertiser(Util.fromJsonString(line)); 
-			//createUser(Util.fromJsonString(line));
+			cleanupAdvertiser(Util.fromJsonString(line));
+			// createUser(Util.fromJsonString(line));
 		}
 
+	}
+
+	private static void updateExistingAdvertisersCache(String email, String id) {
+		if (!getExistingAdvertisersCache().containsKey(email)) {
+			getExistingAdvertisersCache().put(email, new HashSet<String>());
+		}
+
+		getExistingAdvertisersCache().get(email).add(id);
 	}
 }
