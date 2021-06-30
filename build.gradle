@@ -18,6 +18,8 @@ dependencies {
 	implementation "com.mashape.unirest:unirest-java:1.4.9"
 	implementation "com.jcabi:jcabi-aspects:0.22.6"	
 	implementation "commons-io:commons-io:2.9.0"
+	implementation "mysql:mysql-connector-java"
+	implementation "com.alibaba:druid:1.1.10"
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
