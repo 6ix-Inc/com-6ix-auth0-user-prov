@@ -93,6 +93,7 @@ public class UserProv {
 		adsUser.put("name", payload.get("email"));
 
 		if (getExistingAdvertisersCache().containsKey(adsUser.getString("email"))) {
+			logger.info("advertiser with email: {} alreday exist in liveWebinar", liveWebinarResponse.getStatus());
 			return compositeReturn;
 		}
 
