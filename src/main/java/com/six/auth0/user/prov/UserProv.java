@@ -149,7 +149,7 @@ public class UserProv {
 
 		final HttpResponse<JsonNode> liveWebinarResponse = Unirest.post("https://api.archiebot.com/api/users")
 				.header("Accept", "application/vnd.archiebot.v1+json").header("Authorization", authorizationHeader)
-				.field("package_id", "338").field("email", payload.get("email"))
+				.field("package_id", "475").field("email", payload.get("email"))
 				.field("password", "U1" + payload.get("email")).field("status", "active")
 				.field("country_code_iso2", "US").field("confirmed", "true").asJson();
 		return liveWebinarResponse;
